@@ -1,0 +1,10 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: springboot-jwt
+
+jwt:
+  secret:
+    key: dfadf454adf654sd3f
+  header: token
