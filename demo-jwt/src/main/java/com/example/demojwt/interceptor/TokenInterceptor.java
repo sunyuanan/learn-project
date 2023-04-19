@@ -11,32 +11,34 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * @author NDIOT-10
+ * @author SYA
  * @Date 2023/4/14 10:53
  * @Description:
  */
 @Component
 public class TokenInterceptor implements HandlerInterceptor {
 
+
     @Override
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) throws Exception {
+
+        List<String> filtrationList = getFiltrationList();
+
         //地址过滤
         String uri = request.getRequestURI();
-        if (uri.contains("/login")) {
+        if (filtrationList.contains(uri)) {
             return true;
         }
         //Token 验证
         String token = request.getHeader(JwtUtil.getHeader());
-        if (!StringUtils.hasText(token)) {
-            token = request.getParameter(JwtUtil.getHeader());
-        }
-        if (!StringUtils.hasText(token)) {
-            throw new Exception(JwtUtil.getHeader() + "不能为空");
-        }
+        //验证token
+        JwtUtil.verify(token);
 
         TokenContext.setToken(token);
 
@@ -57,5 +59,19 @@ public class TokenInterceptor implements HandlerInterceptor {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         TokenContext.remove();
     }
+
+
+    /**
+     * 获取过滤列表
+     *
+     * @return {@code List<String>}
+     */
+    protected List<String> getFiltrationList() {
+        List<String> filtrationList = new ArrayList<>();
+        filtrationList.add("/login");
+
+        return filtrationList;
+    }
+
 
 }
